@@ -59,6 +59,25 @@ const client = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
   apiKey: process.env.OPENROUTER_API_KEY
 });
+// Render free tier pe server so jaata hai
+// Yeh function khud ko ping karta rehta hai
+// Taaki server jaag ta rahe
+const https = require('https');
+
+function keepAlive() {
+  // Sirf production mein — local pe nahi
+  if (process.env.RENDER_URL) {
+    https.get(process.env.RENDER_URL + '/health', (res) => {
+      console.log('Keep alive ping:', res.statusCode);
+    }).on('error', (err) => {
+      console.log('Keep alive error:', err.message);
+    });
+  }
+}
+
+// Har 14 minute mein ping karo
+// 15 minute pe so jaata hai — toh 14 pe ping
+setInterval(keepAlive, 14 * 60 * 1000);
 
 // 13. Multer storage configure kar rahe hain
 // Yeh batata hai — uploaded image kahan save ho aur kya naam mile
